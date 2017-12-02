@@ -1,26 +1,57 @@
 package com.example.winter.myapplication;
 
 import android.content.Intent;
+import android.media.Image;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
+import com.example.winter.myapplication.entity.Novel;
+import com.example.winter.myapplication.utils.CodeConvertUtils;
+import com.example.winter.myapplication.utils.HttpCallbackListener;
+import com.example.winter.myapplication.utils.HttpUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.LogRecord;
+
+import okhttp3.Call;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class NovelsListActivity extends AppCompatActivity {
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_novels_list);
-//    }
+    private static final String TAG = "NovelsListActivity";
+    private static final int UPDATE_UI = 1;
+
+    private List<Novel> novelList = new ArrayList<>();
 
     private GridView gview;
+    private RecyclerView novelListView;
     private List<Map<String, Object>> data_list;
     private SimpleAdapter sim_adapter;
     // 图片封装为一个数组
@@ -39,11 +70,31 @@ public class NovelsListActivity extends AppCompatActivity {
             "设置3", "语音4", "天气5", "浏览器6", "视频7" ,"通讯录7", "日历8", "照相机8", "时钟8", "游戏", "短信", "铃声",
             "设置", "语音", "天气", "浏览器", "视频8"  };
 
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_UI:
+                    updateUI();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_novels_list);
-        gview = (GridView) findViewById(R.id.gview);
+//        gview = (GridView) findViewById(R.id.gview);
+
+        initNovels();
+        novelListView = (RecyclerView) findViewById(R.id.book_list);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        layoutManager.setOrientation(GridLayoutManager.VERTICAL);
+        novelListView.setLayoutManager(layoutManager);
+        BookAdapter bookAdapter = new BookAdapter(novelList);
+        novelListView.setAdapter(bookAdapter);
+
+
         //新建List
         data_list = new ArrayList<Map<String, Object>>();
         //获取数据
@@ -51,11 +102,56 @@ public class NovelsListActivity extends AppCompatActivity {
         //新建适配器
         String [] from ={"image","text"};
         int [] to = {R.id.image,R.id.text};
-        sim_adapter = new SimpleAdapter(this, data_list, R.layout.one_novel, from, to);
+//        sim_adapter = new SimpleAdapter(this, data_list, R.layout.one_novel, from, to);
         //配置适配器
-        gview.setAdapter(sim_adapter);
+//        gview.setAdapter(sim_adapter);
     }
 
+    public void initNovels() {
+        String json = "{\"count\":10}";
+//        try{
+//            HttpUtils.sendHttpPost(HttpUtils.CommonUrl + "getNovels", json, new HttpCallbackListener() {
+//                @Override
+//                public void onFinish(String response) {
+//                    Gson gson = new Gson();
+//                    Log.e(TAG, response);
+//                    List<Novel> novelList = gson.fromJson(response, new TypeToken<List<Novel>>(){}.getType());
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    e.printStackTrace();
+//                }
+//            });
+//        }catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        RequestBody body = RequestBody.create(HttpUtils.MEDIA_TYPE_JSON, json);
+        HttpUtils.sendOkHttpPost(HttpUtils.CommonUrl + "getNovels", body, new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+                Log.e(TAG, responseData);
+                responseData = CodeConvertUtils.convert(responseData);
+                Log.e(TAG, responseData);
+                JsonReader reader = new JsonReader(new StringReader(responseData));
+                reader.setLenient(true);
+                Log.e(TAG, responseData);
+                Gson gson = new Gson();
+                novelList = gson.fromJson(reader, new TypeToken<List<Novel>>(){}.getType());
+                Message message = new Message();
+                message.what = UPDATE_UI;
+                handler.sendMessage(message);
+            }
+        });
+    }
 
 
     public List<Map<String, Object>> getData(){
@@ -76,4 +172,80 @@ public class NovelsListActivity extends AppCompatActivity {
         Intent intent =new Intent(NovelsListActivity.this,NovelChapterListActivity.class);
         startActivity(intent);
     }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView novelImage;
+        TextView novelName;
+        View novelView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            Log.e(TAG, "createViewHolder");
+            novelView = itemView;
+            novelImage = (ImageView) itemView.findViewById(R.id.book_image);
+            novelName = (TextView) itemView.findViewById(R.id.book_name);
+
+        }
+
+        public void bindView(final Novel novel) {
+            Log.e(TAG, novel.getName());
+            novelName.setText(novel.getName());
+            Picasso.with(NovelsListActivity.this)
+                    .load(novel.getImageurl())
+                    .fit()
+                    .placeholder(R.drawable.book)
+                    .into(novelImage);
+            novelView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new NovelChapterListActivity().newIntent(NovelsListActivity.this, novel.getNo());
+                    startActivity(intent);
+                }
+            });
+
+        }
+    }
+
+    public class BookAdapter extends RecyclerView.Adapter<ViewHolder> {
+        private  List<Novel> mNovelLists;
+
+
+        public BookAdapter(List<Novel> novelList) {
+            super();
+            mNovelLists = novelList;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.e(TAG, "onCreateViewHolder");
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View view = layoutInflater.inflate(R.layout.novel_item, parent, false);
+            final ViewHolder holder = new ViewHolder(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            Log.e(TAG, "onBindViewHolder");
+            Novel novel = mNovelLists.get(position);
+            holder.bindView(novel);
+        }
+
+        @Override
+        public int getItemCount() {
+            Log.e(TAG, "getItemCount" + mNovelLists.size());
+            return mNovelLists.size();
+        }
+    }
+
+    public void updateUI() {
+        Log.e(TAG, "updateUI");
+        BookAdapter mAdapter = new BookAdapter(novelList);
+        novelListView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+    }
+
+
+
 }

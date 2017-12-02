@@ -1,5 +1,6 @@
 package com.example.winter.myapplication;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,14 +8,24 @@ import android.view.View;
 import android.widget.TextView;
 
 public class ChapterActivity extends AppCompatActivity {
+
+    public static final String NOVEL_NO = "NOVEL_CHAPTER_NO";
+
+    public static Intent newIntent(Context context, String novelNo) {
+        Intent intent = new Intent(context, ChapterActivity.class);
+        intent.putExtra(NOVEL_NO, novelNo);
+        return intent;
+    }
+
     private TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chapter);
-        textView = (TextView) findViewById(R.id.chapterContent);
-        String no = getIntent().getStringExtra("no");
-        textView.setText(getData(no));
+//        setContentView(R.layout.activity_chapter);
+        setContentView(R.layout.activity_novel_chapter_list);
+//        textView = (TextView) findViewById(R.id.chapterContent);
+//        String no = getIntent().getStringExtra("no");
+//        textView.setText(getData(no));
     }
 
     public void OpenNew(View v){

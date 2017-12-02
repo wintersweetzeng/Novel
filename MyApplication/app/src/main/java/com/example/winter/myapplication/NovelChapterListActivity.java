@@ -1,10 +1,14 @@
 package com.example.winter.myapplication;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Contacts;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,12 +17,31 @@ import android.widget.ListView;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
+import com.example.winter.myapplication.entity.Chapter;
+import com.example.winter.myapplication.entity.Novel;
+import com.example.winter.myapplication.utils.CodeConvertUtils;
+import com.example.winter.myapplication.utils.HttpUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class NovelChapterListActivity extends AppCompatActivity {
+
+    private static final String TAG = "NovelChapterList";
+    private static final int UPDATE_UI = 1;
+    private String novelNo;
+    private List<Chapter> chapterList;
     private ListView listView;
     private ImageView imageView;
     private SimpleAdapter sim_adapter;
@@ -36,11 +59,22 @@ public class NovelChapterListActivity extends AppCompatActivity {
             R.drawable.book };
     private String[] iconName = {};
 
+    public static final String NOVEL_NO = "NOVEL_NO";
+
+    public static Intent newIntent(Context context, String novelNo) {
+        Intent intent = new Intent(context, NovelChapterListActivity.class);
+        intent.putExtra(NOVEL_NO, novelNo);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_novel_chapter_list);
         listView = (ListView)findViewById(R.id.chaptrList);
+        novelNo = (String) getIntent().getSerializableExtra(NOVEL_NO);
+
+
         list = getData();
         ArrayAdapter<String> myArrayAdapter = new ArrayAdapter<String>
                 (this,android.R.layout.simple_list_item_1,list);
@@ -78,6 +112,45 @@ public class NovelChapterListActivity extends AppCompatActivity {
                 }
             }
 
+        });
+    }
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_UI:
+//                    updateUI();
+            }
+        }
+    };
+
+    private void initDate(){
+
+        String json = "{'novelNo':'"+ novelNo + "'}";
+        RequestBody body = RequestBody.create(HttpUtils.MEDIA_TYPE_JSON, json);
+        HttpUtils.sendOkHttpPost(HttpUtils.CommonUrl + "getChapterList", body, new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+                Log.e(TAG, responseData);
+                responseData = CodeConvertUtils.convert(responseData);
+                Log.e(TAG, responseData);
+                JsonReader reader = new JsonReader(new StringReader(responseData));
+                reader.setLenient(true);
+                Log.e(TAG, responseData);
+                Gson gson = new Gson();
+                chapterList = gson.fromJson(reader, new TypeToken<List<Chapter>>(){}.getType());
+                Message message = new Message();
+                message.what = UPDATE_UI;
+                handler.sendMessage(message);
+            }
         });
     }
 
