@@ -35,11 +35,11 @@
         android:layout_width="match_parent"
         android:layout_height="450dp">
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/chaptrList"
             android:layout_width="match_parent"
 
-            android:layout_height="450dp"></ListView>
+            android:layout_height="450dp"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
     <!--</LinearLayout>-->
     <LinearLayout

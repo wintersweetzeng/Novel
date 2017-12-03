@@ -8,14 +8,20 @@ import android.os.Message;
 import android.provider.Contacts;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.example.winter.myapplication.entity.Chapter;
 import com.example.winter.myapplication.entity.Novel;
@@ -41,8 +47,8 @@ public class NovelChapterListActivity extends AppCompatActivity {
     private static final String TAG = "NovelChapterList";
     private static final int UPDATE_UI = 1;
     private String novelNo;
-    private List<Chapter> chapterList;
-    private ListView listView;
+    private List<Chapter> chapterList = new ArrayList<>();
+    private RecyclerView listView;
     private ImageView imageView;
     private SimpleAdapter sim_adapter;
     private List<Map<String, Object>> data_list;
@@ -71,14 +77,17 @@ public class NovelChapterListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_novel_chapter_list);
-        listView = (ListView)findViewById(R.id.chaptrList);
+        listView = (RecyclerView) findViewById(R.id.chaptrList);
         novelNo = (String) getIntent().getSerializableExtra(NOVEL_NO);
-
-
-        list = getData();
-        ArrayAdapter<String> myArrayAdapter = new ArrayAdapter<String>
-                (this,android.R.layout.simple_list_item_1,list);
-        listView.setAdapter(myArrayAdapter);
+        initDate();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        listView.setLayoutManager(layoutManager);
+        ChapterAdapter adapter = new ChapterAdapter(chapterList);
+        listView.setAdapter(adapter);
+//        list = getData();
+//        ArrayAdapter<String> myArrayAdapter = new ArrayAdapter<String>
+//                (this,android.R.layout.simple_list_item_1,list);
+//        listView.setAdapter(myArrayAdapter);
         imageView = (ImageView)findViewById(R.id.img);
         imageView.setImageResource(R.drawable.book);
 //        String [] from ={"image","text"};
@@ -87,32 +96,32 @@ public class NovelChapterListActivity extends AppCompatActivity {
 //        sim_adapter = new SimpleAdapter(this, data_list, R.layout.one_novel, from, to);
 //
 //        listView.setAdapter(sim_adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
-                // TODO Auto-generated method stub
-                if(list.get(arg2).equals("第1章"))
-                {
-                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
-                    intent.putExtra("no", "1");
-                    startActivity(intent);
-                }
-                if(list.get(arg2).equals("第2章"))
-                {
-                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
-                    intent.putExtra("no", "2");
-                    startActivity(intent);
-                }
-                else {
-                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
-                    intent.putExtra("no", arg2+"");
-                    startActivity(intent);
-                }
-            }
-
-        });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+//                                    long arg3) {
+//                // TODO Auto-generated method stub
+//                if(list.get(arg2).equals("第1章"))
+//                {
+//                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
+//                    intent.putExtra("no", "1");
+//                    startActivity(intent);
+//                }
+//                if(list.get(arg2).equals("第2章"))
+//                {
+//                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
+//                    intent.putExtra("no", "2");
+//                    startActivity(intent);
+//                }
+//                else {
+//                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
+//                    intent.putExtra("no", arg2+"");
+//                    startActivity(intent);
+//                }
+//            }
+//
+//        });
     }
 
     private Handler handler = new Handler() {
@@ -120,14 +129,21 @@ public class NovelChapterListActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case UPDATE_UI:
-//                    updateUI();
+                    updateUI();
             }
         }
     };
 
+    public void updateUI(){
+        Log.e(TAG, "updateUI");
+        ChapterAdapter adapter = new ChapterAdapter(chapterList);
+        listView.setAdapter(adapter);
+    }
+
     private void initDate(){
 
-        String json = "{'novelNo':'"+ novelNo + "'}";
+        String json = "{\"novelNo\":\""+ novelNo + "\"}";
+        Log.e(TAG, json);
         RequestBody body = RequestBody.create(HttpUtils.MEDIA_TYPE_JSON, json);
         HttpUtils.sendOkHttpPost(HttpUtils.CommonUrl + "getChapterList", body, new okhttp3.Callback() {
             @Override
@@ -187,5 +203,57 @@ public class NovelChapterListActivity extends AppCompatActivity {
         //新建一个显式意图，第一个参数为当前Activity类对象，第二个参数为你要打开的Activity类
         Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
         startActivity(intent);
+    }
+
+    private class ChapterHolder extends RecyclerView.ViewHolder {
+        TextView textView;
+
+        public ChapterHolder(View itemView) {
+            super(itemView);
+            textView = (TextView) itemView.findViewById(android.R.id.text1);
+        }
+
+        public void bindView (Chapter chapter) {
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    Intent intent = new Intent()
+                }
+            });
+        }
+    }
+
+    public class ChapterAdapter extends RecyclerView.Adapter<ChapterHolder> {
+        private List<Chapter> mChapterLists;
+
+        public ChapterAdapter(List<Chapter> chapterList) {
+            super();
+            mChapterLists = chapterList;
+        }
+
+        @Override
+        public ChapterHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.e(TAG, "onCreateViewHolder");
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            ChapterHolder holder = new ChapterHolder(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(ChapterHolder holder, int position) {
+            Log.e(TAG, "onBindViewHolder");
+            Chapter chapter = mChapterLists.get(position);
+            holder.textView.setText(chapter.getChapterNo() + "  " + chapter.getChapterTitle());
+            holder.bindView(chapter);
+        }
+
+        @Override
+        public int getItemCount() {
+            if (mChapterLists == null) {
+                return 0;
+            }
+            Log.e(TAG, "getItemCount: " + mChapterLists.size());
+            return mChapterLists.size();
+        }
     }
 }
