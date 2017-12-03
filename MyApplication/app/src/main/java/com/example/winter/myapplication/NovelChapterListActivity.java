@@ -213,11 +213,12 @@ public class NovelChapterListActivity extends AppCompatActivity {
             textView = (TextView) itemView.findViewById(android.R.id.text1);
         }
 
-        public void bindView (Chapter chapter) {
+        public void bindView (final Chapter chapter) {
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Intent intent = new Intent()
+                    Intent intent = new ChapterActivity().newIntent(NovelChapterListActivity.this, novelNo, chapter.getChapterNo(), chapter.getChapterTitle());
+                    startActivity(intent);
                 }
             });
         }

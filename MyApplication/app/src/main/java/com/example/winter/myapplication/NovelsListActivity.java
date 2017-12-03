@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -37,9 +38,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogRecord;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -191,9 +193,19 @@ public class NovelsListActivity extends AppCompatActivity {
         public void bindView(final Novel novel) {
             Log.e(TAG, novel.getName());
             novelName.setText(novel.getName());
+            Log.e(TAG, novel.getImageurl());
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(5, TimeUnit.SECONDS)
+                    .writeTimeout(5, TimeUnit.SECONDS)
+                    .build();
+//            Picasso picasso = new Picasso.Builder(NovelsListActivity.this)
+//                    .downloader(new OkHttpDownloader(okHttpClient))
+//                    .build();
             Picasso.with(NovelsListActivity.this)
                     .load(novel.getImageurl())
                     .fit()
+//                    .networkPolicy()
                     .placeholder(R.drawable.book)
                     .into(novelImage);
             novelView.setOnClickListener(new View.OnClickListener() {
@@ -243,7 +255,6 @@ public class NovelsListActivity extends AppCompatActivity {
         Log.e(TAG, "updateUI");
         BookAdapter mAdapter = new BookAdapter(novelList);
         novelListView.setAdapter(mAdapter);
-        mAdapter.notifyDataSetChanged();
     }
 
 
