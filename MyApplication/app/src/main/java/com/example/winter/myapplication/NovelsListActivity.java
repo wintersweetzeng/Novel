@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.winter.myapplication.entity.Novel;
 import com.example.winter.myapplication.utils.CodeConvertUtils;
 import com.example.winter.myapplication.utils.HttpCallbackListener;
@@ -194,20 +195,26 @@ public class NovelsListActivity extends AppCompatActivity {
             Log.e(TAG, novel.getName());
             novelName.setText(novel.getName());
             Log.e(TAG, novel.getImageurl());
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(5, TimeUnit.SECONDS)
-                    .writeTimeout(5, TimeUnit.SECONDS)
-                    .build();
-//            Picasso picasso = new Picasso.Builder(NovelsListActivity.this)
-//                    .downloader(new OkHttpDownloader(okHttpClient))
+//            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+//                    .connectTimeout(5, TimeUnit.SECONDS)
+//                    .readTimeout(5, TimeUnit.SECONDS)
+//                    .writeTimeout(5, TimeUnit.SECONDS)
 //                    .build();
-            Picasso.with(NovelsListActivity.this)
+//            Picasso picasso = new Picasso.Builder(NovelsListActivity.this)
+//                    .build();
+//            picasso.with(NovelsListActivity.this)
+//                    .load(novel.getImageurl())
+//                    .fit()
+////                    .networkPolicy()
+//                    .placeholder(R.drawable.book)
+//                    .into(novelImage);
+            Glide.with(NovelsListActivity.this)
                     .load(novel.getImageurl())
-                    .fit()
-//                    .networkPolicy()
+                    .fitCenter()
                     .placeholder(R.drawable.book)
+                    .crossFade()
                     .into(novelImage);
+
             novelView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
