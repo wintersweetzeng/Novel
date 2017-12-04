@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -134,10 +135,13 @@ public class ChapterActivity extends AppCompatActivity {
 
     private void showPopupWindow() {
         //设置contentView
-        View contentView = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.popuplayout, null);
+        final View contentView = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.popuplayout, null);
         mPopWindow = new PopupWindow(contentView,
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
         mPopWindow.setContentView(contentView);
+        mPopWindow.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
+        mPopWindow.setHeight(ViewGroup.LayoutParams.FILL_PARENT);
+//        mPopWindow.showAsDropDown(mMenuTv);
         //设置各个控件的点击响应
 //        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_computer);
 //        TextView tv2 = (TextView)contentView.findViewById(R.id.pop_financial);
@@ -148,7 +152,14 @@ public class ChapterActivity extends AppCompatActivity {
 //        tv3.setOnClickListener(this);
         //显示PopupWindow
         View rootview = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.activity_chapter, null);
-        mPopWindow.showAtLocation(rootview, Gravity.CENTER, 0, 0);
+        mPopWindow.showAtLocation(rootview, Gravity.CENTER, 100, 100);
+
+        contentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPopWindow.dismiss();
+            }
+        });
 
     }
 }

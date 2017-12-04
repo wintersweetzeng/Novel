@@ -1,18 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="30dp"
+    android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ffffff"
-    android:orientation="vertical"
-    android:paddingBottom="2dp">
-    <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/poplist"-->
-        <!--android:layout_width="20dp"-->
-        <!--android:background="#ffffff"-->
-        <!--android:layout_height="fill_parent">-->
+    android:background="#66000000">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:paddingBottom="2dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_alignParentBottom="true">
 
-    <!--</android.support.v7.widget.RecyclerView>-->
+        <TextView
+            android:id="@+id/pop_computer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="上一章"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/pop_financial"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:text="目录"/>
+
+        <TextView
+            android:id="@+id/pop_manage"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="下一章"/>
+
+
+    </LinearLayout>
+</RelativeLayout>
