@@ -30,17 +30,18 @@
             android:textSize="30dp"
             android:text="@string/novelName"/>
         </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="450dp">
-    <ListView
-        android:id="@+id/chaptrList"
-        android:layout_width="match_parent"
 
-        android:layout_height="450dp">
-    </ListView>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chaptrList"
+            android:layout_width="match_parent"
+
+            android:layout_height="450dp"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
-<!--</LinearLayout>-->
+    <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -52,24 +53,21 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/search"
-            android:layout_weight="0.1"
-            android:onClick="OpenNew"/>
+            android:layout_weight="0.1"/>
         <Button
             android:id="@+id/two"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/one"
             android:text="@string/thought"
-            android:layout_weight="0.1"
-            android:onClick="OpenNew"/>
+            android:layout_weight="0.1"/>
         <Button
 
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/me"
             android:layout_toRightOf="@+id/two"
-            android:layout_weight="0.1"
-            android:onClick="OpenNew"/>
+            android:layout_weight="0.1"/>
     </LinearLayout>
 
 </LinearLayout>
