@@ -1,10 +1,12 @@
 package com.example.winter.myapplication.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by liudashuang on 2017/12/3.
  */
 
-public class Chapter {
+public class Chapter implements Serializable {
 
     private String chapterNo;
     private String chapterSourceUrl;
@@ -33,4 +35,6 @@ public class Chapter {
     public void setChapterTitle(String chapterTitle) {
         this.chapterTitle = chapterTitle;
     }
+
+
 }

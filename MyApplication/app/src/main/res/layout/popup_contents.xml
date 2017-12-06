@@ -10,10 +10,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="2dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="#80000000"
         android:layout_alignParentLeft="true">
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/pop_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

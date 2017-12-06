@@ -54,7 +54,7 @@ public class NovelChapterListActivity extends AppCompatActivity {
     private SimpleAdapter sim_adapter;
     private List<Map<String, Object>> data_list;
     private List<String> list = new ArrayList<String>();
-    private HashMap<String, List<Chapter>> novelChapters;
+    private HashMap<String, List<Chapter>> novelChapters = new HashMap<>();
 
     private int[] icon = { R.drawable.book, R.drawable.book,
             R.drawable.book, R.drawable.book, R.drawable.book,
@@ -92,38 +92,6 @@ public class NovelChapterListActivity extends AppCompatActivity {
 //        listView.setAdapter(myArrayAdapter);
         imageView = (ImageView)findViewById(R.id.img);
         imageView.setImageResource(R.drawable.book);
-//        String [] from ={"image","text"};
-////        int [] to = {R.id.image,R.id.text};
-//        int [] to = {R.id.image,R.id.text};
-//        sim_adapter = new SimpleAdapter(this, data_list, R.layout.one_novel, from, to);
-//
-//        listView.setAdapter(sim_adapter);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-//                                    long arg3) {
-//                // TODO Auto-generated method stub
-//                if(list.get(arg2).equals("第1章"))
-//                {
-//                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
-//                    intent.putExtra("no", "1");
-//                    startActivity(intent);
-//                }
-//                if(list.get(arg2).equals("第2章"))
-//                {
-//                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
-//                    intent.putExtra("no", "2");
-//                    startActivity(intent);
-//                }
-//                else {
-//                    Intent intent =new Intent(NovelChapterListActivity.this,ChapterActivity.class);
-//                    intent.putExtra("no", arg2+"");
-//                    startActivity(intent);
-//                }
-//            }
-//
-//        });
     }
 
     private Handler handler = new Handler() {
@@ -216,7 +184,7 @@ public class NovelChapterListActivity extends AppCompatActivity {
             textView = (TextView) itemView.findViewById(android.R.id.text1);
         }
 
-        public void bindView (final Chapter chapter) {
+        public void bindView (final Chapter chapter,final int position) {
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -225,6 +193,7 @@ public class NovelChapterListActivity extends AppCompatActivity {
 //                    Bundle bundle = new Bundle();
 //                    bundle.putSerializable(NOVEL_CHAPTERS, novelChapters);
                     intent.putExtra(NOVEL_CHAPTERS, novelChapters);
+                    intent.putExtra("POSITION", position);
                     startActivity(intent);
                 }
             });
@@ -252,7 +221,7 @@ public class NovelChapterListActivity extends AppCompatActivity {
             Log.e(TAG, "onBindViewHolder");
             Chapter chapter = mChapterLists.get(position);
             holder.textView.setText(chapter.getChapterNo() + "  " + chapter.getChapterTitle());
-            holder.bindView(chapter);
+            holder.bindView(chapter, position);
         }
 
         @Override
