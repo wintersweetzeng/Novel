@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
@@ -38,12 +40,14 @@ public class ChapterActivity extends AppCompatActivity {
     public static final String CHAPTER_NO = "CHAPTER_NO";
     public static final String NOVEL_NO = "NOVEL_NO";
     public static final String CHAPTER_TITLE = "CHAPTER_TITLE";
+    private static final String NOVEL_CHAPTERS = "NOVEL_CHAPTERS";
 
     private String getContentJson = "";
     private String content = "";
     private static final int UPDATE_UI = 1;
     private PopupWindow mPopWindow;
-
+    private PopupWindow mPopContents;
+    private HashMap<String, List<Chapter>> novelChapters;
 
     public static Intent newIntent(Context context, String novelNo, String chapterNO, String chapterTitle) {
         Log.e(TAG, novelNo + chapterNO + chapterTitle);
@@ -62,6 +66,7 @@ public class ChapterActivity extends AppCompatActivity {
         String novelNo = (String) getIntent().getSerializableExtra(NOVEL_NO);
         String chapterNo = (String) getIntent().getSerializableExtra(CHAPTER_NO);
         String chapterTitle = (String) getIntent().getSerializableExtra(CHAPTER_TITLE);
+        novelChapters = (HashMap<String, List<Chapter>>) getIntent().getSerializableExtra(NOVEL_CHAPTERS);
         getContentJson = "{\"novelNo\":\""+novelNo+"\",\"chapterNo\":\""+chapterNo+"\", \"chapterTitle\":\""+chapterTitle+"\"}";
 //        setContentView(R.layout.activity_novel_chapter_list);
         textView = (TextView) findViewById(R.id.chapterContent);
@@ -134,10 +139,13 @@ public class ChapterActivity extends AppCompatActivity {
 
     private void showPopupWindow() {
         //设置contentView
-        View contentView = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.popuplayout, null);
+        final View contentView = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.popuplayout, null);
         mPopWindow = new PopupWindow(contentView,
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
         mPopWindow.setContentView(contentView);
+        mPopWindow.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
+        mPopWindow.setHeight(ViewGroup.LayoutParams.FILL_PARENT);
+//        mPopWindow.showAsDropDown(mMenuTv);
         //设置各个控件的点击响应
 //        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_computer);
 //        TextView tv2 = (TextView)contentView.findViewById(R.id.pop_financial);
@@ -148,7 +156,42 @@ public class ChapterActivity extends AppCompatActivity {
 //        tv3.setOnClickListener(this);
         //显示PopupWindow
         View rootview = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.activity_chapter, null);
-        mPopWindow.showAtLocation(rootview, Gravity.CENTER, 0, 0);
+        mPopWindow.showAtLocation(rootview, Gravity.CENTER, 100, 100);
 
+        contentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPopWindow.dismiss();
+            }
+        });
+
+    }
+
+    private void showPopupContents() {
+        final View contentView = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.popup_contents, null);
+        mPopContents = new PopupWindow(contentView,
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+        mPopContents.setContentView(contentView);
+        mPopContents.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
+        mPopContents.setHeight(ViewGroup.LayoutParams.FILL_PARENT);
+//        mPopWindow.showAsDropDown(mMenuTv);
+        //设置各个控件的点击响应
+//        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_computer);
+//        TextView tv2 = (TextView)contentView.findViewById(R.id.pop_financial);
+//        TextView tv3 = (TextView)contentView.findViewById(R.id.pop_manage);
+//
+//        tv1.setOnClickListener(this);
+//        tv2.setOnClickListener(this);
+//        tv3.setOnClickListener(this);
+        //显示PopupWindow
+        View rootview = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.activity_chapter, null);
+        mPopContents.showAtLocation(rootview, Gravity.CENTER, 100, 100);
+
+        contentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPopContents.dismiss();
+            }
+        });
     }
 }

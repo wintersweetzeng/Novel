@@ -45,6 +45,7 @@ import okhttp3.Response;
 public class NovelChapterListActivity extends AppCompatActivity {
 
     private static final String TAG = "NovelChapterList";
+    private static final String NOVEL_CHAPTERS = "NOVEL_CHAPTERS";
     private static final int UPDATE_UI = 1;
     private String novelNo;
     private List<Chapter> chapterList = new ArrayList<>();
@@ -53,6 +54,7 @@ public class NovelChapterListActivity extends AppCompatActivity {
     private SimpleAdapter sim_adapter;
     private List<Map<String, Object>> data_list;
     private List<String> list = new ArrayList<String>();
+    private HashMap<String, List<Chapter>> novelChapters;
 
     private int[] icon = { R.drawable.book, R.drawable.book,
             R.drawable.book, R.drawable.book, R.drawable.book,
@@ -163,6 +165,7 @@ public class NovelChapterListActivity extends AppCompatActivity {
                 Log.e(TAG, responseData);
                 Gson gson = new Gson();
                 chapterList = gson.fromJson(reader, new TypeToken<List<Chapter>>(){}.getType());
+                novelChapters.put(novelNo, chapterList);
                 Message message = new Message();
                 message.what = UPDATE_UI;
                 handler.sendMessage(message);
@@ -217,7 +220,11 @@ public class NovelChapterListActivity extends AppCompatActivity {
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new ChapterActivity().newIntent(NovelChapterListActivity.this, novelNo, chapter.getChapterNo(), chapter.getChapterTitle());
+                    Intent intent = new ChapterActivity().newIntent(NovelChapterListActivity.this,
+                            novelNo, chapter.getChapterNo(), chapter.getChapterTitle());
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable(NOVEL_CHAPTERS, novelChapters);
+                    intent.putExtra(NOVEL_CHAPTERS, novelChapters);
                     startActivity(intent);
                 }
             });
