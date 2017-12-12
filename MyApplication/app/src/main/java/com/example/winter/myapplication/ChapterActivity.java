@@ -6,12 +6,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -27,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +38,7 @@ import okhttp3.Call;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ChapterActivity extends AppCompatActivity {
+public class ChapterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ChapterActivity";
     public static final String CHAPTER_NO = "CHAPTER_NO";
@@ -47,7 +51,13 @@ public class ChapterActivity extends AppCompatActivity {
     private static final int UPDATE_UI = 1;
     private PopupWindow mPopWindow;
     private PopupWindow mPopContents;
-    private HashMap<String, List<Chapter>> novelChapters;
+    private HashMap<String, ArrayList<Chapter>> novelChapters;
+    private ArrayList<Chapter> chapterLists = new ArrayList<>();
+    private String novelNo = "";
+    private String chapterNo = "";
+    private String chapterTitle = "";
+    private ChapterAdapter mContentAdapter;
+    private int mCurrentPositioin;
 
     public static Intent newIntent(Context context, String novelNo, String chapterNO, String chapterTitle) {
         Log.e(TAG, novelNo + chapterNO + chapterTitle);
@@ -63,10 +73,12 @@ public class ChapterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chapter);
-        String novelNo = (String) getIntent().getSerializableExtra(NOVEL_NO);
-        String chapterNo = (String) getIntent().getSerializableExtra(CHAPTER_NO);
-        String chapterTitle = (String) getIntent().getSerializableExtra(CHAPTER_TITLE);
-        novelChapters = (HashMap<String, List<Chapter>>) getIntent().getSerializableExtra(NOVEL_CHAPTERS);
+        novelNo = (String) getIntent().getSerializableExtra(NOVEL_NO);
+        chapterNo = (String) getIntent().getSerializableExtra(CHAPTER_NO);
+        chapterTitle = (String) getIntent().getSerializableExtra(CHAPTER_TITLE);
+        mCurrentPositioin  = (Integer) getIntent().getSerializableExtra("POSITION");
+        novelChapters = (HashMap<String, ArrayList<Chapter>>) getIntent().getSerializableExtra(NOVEL_CHAPTERS);
+        chapterLists = novelChapters.get(novelNo);
         getContentJson = "{\"novelNo\":\""+novelNo+"\",\"chapterNo\":\""+chapterNo+"\", \"chapterTitle\":\""+chapterTitle+"\"}";
 //        setContentView(R.layout.activity_novel_chapter_list);
         textView = (TextView) findViewById(R.id.chapterContent);
@@ -147,13 +159,13 @@ public class ChapterActivity extends AppCompatActivity {
         mPopWindow.setHeight(ViewGroup.LayoutParams.FILL_PARENT);
 //        mPopWindow.showAsDropDown(mMenuTv);
         //设置各个控件的点击响应
-//        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_computer);
-//        TextView tv2 = (TextView)contentView.findViewById(R.id.pop_financial);
-//        TextView tv3 = (TextView)contentView.findViewById(R.id.pop_manage);
-//
-//        tv1.setOnClickListener(this);
-//        tv2.setOnClickListener(this);
-//        tv3.setOnClickListener(this);
+        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_forward_chapter);
+        TextView tv2 = (TextView)contentView.findViewById(R.id.pop_content_btn);
+        TextView tv3 = (TextView)contentView.findViewById(R.id.pop_last_chapter);
+
+        tv1.setOnClickListener(this);
+        tv2.setOnClickListener(this);
+        tv3.setOnClickListener(this);
         //显示PopupWindow
         View rootview = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.activity_chapter, null);
         mPopWindow.showAtLocation(rootview, Gravity.CENTER, 100, 100);
@@ -174,6 +186,7 @@ public class ChapterActivity extends AppCompatActivity {
         mPopContents.setContentView(contentView);
         mPopContents.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
         mPopContents.setHeight(ViewGroup.LayoutParams.FILL_PARENT);
+
 //        mPopWindow.showAsDropDown(mMenuTv);
         //设置各个控件的点击响应
 //        TextView tv1 = (TextView)contentView.findViewById(R.id.pop_computer);
@@ -184,6 +197,13 @@ public class ChapterActivity extends AppCompatActivity {
 //        tv2.setOnClickListener(this);
 //        tv3.setOnClickListener(this);
         //显示PopupWindow
+
+        RecyclerView recycleContent = (RecyclerView) contentView.findViewById(R.id.pop_content);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(ChapterActivity.this);
+        mContentAdapter = new ChapterAdapter(novelChapters.get(novelNo));
+        recycleContent.setLayoutManager(layoutManager);
+        recycleContent.setAdapter(mContentAdapter);
+
         View rootview = LayoutInflater.from(ChapterActivity.this).inflate(R.layout.activity_chapter, null);
         mPopContents.showAtLocation(rootview, Gravity.CENTER, 100, 100);
 
@@ -193,5 +213,98 @@ public class ChapterActivity extends AppCompatActivity {
                 mPopContents.dismiss();
             }
         });
+    }
+
+
+    private class ChapterHolder extends RecyclerView.ViewHolder {
+        TextView textView;
+
+        public ChapterHolder(View itemView) {
+            super(itemView);
+            textView = (TextView) itemView.findViewById(android.R.id.text1);
+        }
+
+        public void bindView (final Chapter chapter) {
+            textView.setText(chapter.getChapterNo() + "  " + chapter.getChapterTitle());
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    chapterNo = chapter.getChapterNo();
+                    chapterTitle = chapter.getChapterTitle();
+                    getContentJson = "{\"novelNo\":\""+novelNo+"\",\"chapterNo\":\""+chapterNo+"\", \"chapterTitle\":\""+chapterTitle+"\"}";
+                    getData();
+                    updateUI();
+//                    Intent intent = new ChapterActivity().newIntent(ChapterActivity.this,
+//                            novelNo, chapter.getChapterNo(), chapter.getChapterTitle());
+////                    Bundle bundle = new Bundle();
+////                    bundle.putSerializable(NOVEL_CHAPTERS, novelChapters);
+//                    intent.putExtra(NOVEL_CHAPTERS, novelChapters);
+//                    startActivity(intent);
+                }
+            });
+        }
+    }
+
+    public class ChapterAdapter extends RecyclerView.Adapter<ChapterHolder> {
+        private List<Chapter> mChapterLists;
+
+        public ChapterAdapter(List<Chapter> chapterList) {
+            super();
+            mChapterLists = chapterList;
+        }
+
+        @Override
+        public ChapterHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.e(TAG, "onCreateViewHolder");
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            ChapterHolder holder = new ChapterHolder(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(ChapterHolder holder, int position) {
+            Log.e(TAG, "onBindViewHolder");
+            Chapter chapter = mChapterLists.get(position);
+//            holder.textView.setText(chapter.getChapterNo() + "  " + chapter.getChapterTitle());
+            mCurrentPositioin = position;
+            holder.bindView(chapter);
+        }
+
+        @Override
+        public int getItemCount() {
+            if (mChapterLists == null) {
+                return 0;
+            }
+            Log.e(TAG, "getItemCount: " + mChapterLists.size());
+            return mChapterLists.size();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.pop_content_btn:
+                mPopWindow.dismiss();
+                showPopupContents();
+                break;
+            case R.id.pop_forward_chapter:
+//                mPopWindow.dismiss();
+                if (chapterLists.size() > 0 && mCurrentPositioin > 0) {
+                    Chapter chapter = chapterLists.get(mCurrentPositioin - 1);
+                    mCurrentPositioin = mCurrentPositioin - 1;
+                    getContentJson = "{\"novelNo\":\""+novelNo+"\",\"chapterNo\":\""+chapter.getChapterNo()+"\", \"chapterTitle\":\""+chapter.getChapterTitle()+"\"}";
+                }
+                getData();
+                break;
+            case R.id.pop_last_chapter:
+//                mPopWindow.dismiss();
+                if (chapterLists.size() > mCurrentPositioin + 1) {
+                    Chapter chapter = chapterLists.get(mCurrentPositioin + 1);
+                    mCurrentPositioin = mCurrentPositioin + 1;
+                    getContentJson = "{\"novelNo\":\""+novelNo+"\",\"chapterNo\":\""+chapter.getChapterNo()+"\", \"chapterTitle\":\""+chapter.getChapterTitle()+"\"}";
+                }
+                getData();
+                break;
+        }
     }
 }
