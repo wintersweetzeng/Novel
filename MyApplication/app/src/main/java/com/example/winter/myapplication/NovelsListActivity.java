@@ -112,23 +112,6 @@ public class NovelsListActivity extends AppCompatActivity {
 
     public void initNovels() {
         String json = "{\"count\":10}";
-//        try{
-//            HttpUtils.sendHttpPost(HttpUtils.CommonUrl + "getNovels", json, new HttpCallbackListener() {
-//                @Override
-//                public void onFinish(String response) {
-//                    Gson gson = new Gson();
-//                    Log.e(TAG, response);
-//                    List<Novel> novelList = gson.fromJson(response, new TypeToken<List<Novel>>(){}.getType());
-//                }
-//
-//                @Override
-//                public void onError(Exception e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//        }catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         RequestBody body = RequestBody.create(HttpUtils.MEDIA_TYPE_JSON, json);
         HttpUtils.sendOkHttpPost(HttpUtils.CommonUrl + "getNovels", body, new okhttp3.Callback() {
@@ -218,7 +201,8 @@ public class NovelsListActivity extends AppCompatActivity {
             novelView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new NovelChapterListActivity().newIntent(NovelsListActivity.this, novel.getNo());
+                    Intent intent = new NovelChapterListActivity().newIntent(NovelsListActivity.this,
+                            novel.getNo(), novel.getName(), novel.getImageurl());
                     startActivity(intent);
                 }
             });
@@ -263,7 +247,5 @@ public class NovelsListActivity extends AppCompatActivity {
         BookAdapter mAdapter = new BookAdapter(novelList);
         novelListView.setAdapter(mAdapter);
     }
-
-
 
 }
