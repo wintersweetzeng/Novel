@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyApplication</string>
+    <string name="app_name">Novel</string>
     <string name="all_novels_title">书架</string>
     <string name="me">我</string>
     <string name="thought">想法</string>
