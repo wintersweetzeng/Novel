@@ -61,6 +61,8 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
     private String chapterTitle = "";
     private ChapterAdapter mContentAdapter;
     private int mCurrentPositioin;
+    private static int mFontSize = 10;
+    private static int mLightIntensity = 50;
 
     public static Intent newIntent(Context context, String novelNo, String chapterNO, String chapterTitle) {
         Log.e(TAG, novelNo + chapterNO + chapterTitle);
@@ -94,6 +96,13 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
 //        String no = getIntent().getStringExtra("no");
         getData();
         textView.setText(content);
+        textView.setTextSize(mFontSize);
+
+        Window window = ChapterActivity.this.getWindow();
+        WindowManager.LayoutParams lp = window.getAttributes();
+        lp.screenBrightness = (mLightIntensity <= 0 ? 1 : mLightIntensity) / 255f;
+        window.setAttributes(lp);
+
     }
 
     private Handler handler = new Handler() {
@@ -168,6 +177,8 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
         SeekBar fontSeekBar = (SeekBar) contentView.findViewById(R.id.font_size);
         SeekBar lightSeekBar = (SeekBar) contentView.findViewById(R.id.light_intensity);
 
+        fontSeekBar.setProgress(mFontSize);
+        lightSeekBar.setProgress(mLightIntensity);
         fontSeekBar.setOnSeekBarChangeListener(this);
         lightSeekBar.setOnSeekBarChangeListener(this);
 
@@ -324,6 +335,7 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
         int id = seekBar.getId();
         if (id == R.id.font_size) {
             textView.setTextSize(progress+10);
+            mFontSize = progress;
         }
         if (id == R.id.light_intensity) {
             Log.e(TAG, "light_intensity");
