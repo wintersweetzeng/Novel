@@ -4,39 +4,93 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#66000000">
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:paddingBottom="2dp"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
         android:background="#80000000"
+        android:orientation="vertical">
 
-        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="#80000000"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/pop_forward_chapter"
-            android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp">
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textSize="20dp"
+                    android:text="大小"/>
+                <SeekBar
+                    android:id="@+id/font_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:max="20" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp">
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:text="亮度"/>
+
+                <SeekBar
+                    android:id="@+id/light_intensity"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:max="255"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="上一章"/>
+            android:orientation="horizontal"
+            android:paddingBottom="2dp"
+            android:background="#80000000"
+            android:layout_alignParentBottom="true">
 
-        <TextView
-            android:id="@+id/pop_content_btn"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_height="match_parent"
-            android:text="目录"/>
+            <TextView
+                android:id="@+id/pop_forward_chapter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="上一章"/>
 
-        <TextView
-            android:id="@+id/pop_last_chapter"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="下一章"/>
+            <TextView
+                android:id="@+id/pop_content_btn"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_height="match_parent"
+                android:text="目录"/>
 
+            <TextView
+                android:id="@+id/pop_last_chapter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="下一章"/>
+
+        </LinearLayout>
 
     </LinearLayout>
+
+
 </RelativeLayout>
