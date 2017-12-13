@@ -16,36 +16,36 @@
         <!--&gt;-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="50dp"
         android:orientation="horizontal">
-    <ImageView
-        android:id="@+id/img"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
-        <TextView
-            android:layout_toRightOf="@+id/img"
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="100dp"
+            android:layout_height="match_parent" />
 
+        <TextView
+            android:id="@+id/novel_name"
+            android:layout_toRightOf="@+id/img"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="match_parent"
             android:textSize="30dp"
             android:text="@string/novelName"/>
         </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="450dp">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chaptrList"
             android:layout_width="match_parent"
 
-            android:layout_height="450dp"></android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
     <!--</LinearLayout>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.1"
         >
 
         <Button

@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.winter.myapplication.entity.Chapter;
 import com.example.winter.myapplication.entity.Novel;
 import com.example.winter.myapplication.utils.CodeConvertUtils;
@@ -30,6 +31,8 @@ import com.example.winter.myapplication.utils.HttpUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -48,9 +51,12 @@ public class NovelChapterListActivity extends AppCompatActivity {
     private static final String NOVEL_CHAPTERS = "NOVEL_CHAPTERS";
     private static final int UPDATE_UI = 1;
     private String novelNo;
+    private String novelName;
+    private String novelImgUrl;
     private List<Chapter> chapterList = new ArrayList<>();
     private RecyclerView listView;
     private ImageView imageView;
+    private TextView nameView;
     private SimpleAdapter sim_adapter;
     private List<Map<String, Object>> data_list;
     private List<String> list = new ArrayList<String>();
@@ -68,10 +74,14 @@ public class NovelChapterListActivity extends AppCompatActivity {
     private String[] iconName = {};
 
     public static final String NOVEL_NO = "NOVEL_NO";
+    public static final String NOVEL_NAME = "NOVEL_NAME";
+    public static final String NOVEL_IMG_URL = "NOVEL_IMG_URL";
 
-    public static Intent newIntent(Context context, String novelNo) {
+    public static Intent newIntent(Context context, String novelNo, String novelName, String imageUrl) {
         Intent intent = new Intent(context, NovelChapterListActivity.class);
         intent.putExtra(NOVEL_NO, novelNo);
+        intent.putExtra(NOVEL_NAME, novelName);
+        intent.putExtra(NOVEL_IMG_URL, imageUrl);
         return intent;
     }
 
@@ -80,18 +90,25 @@ public class NovelChapterListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_novel_chapter_list);
         listView = (RecyclerView) findViewById(R.id.chaptrList);
+        nameView = (TextView) findViewById(R.id.novel_name);
         novelNo = (String) getIntent().getSerializableExtra(NOVEL_NO);
+        novelName = (String) getIntent().getSerializableExtra(NOVEL_NAME);
+        novelImgUrl = (String) getIntent().getSerializableExtra(NOVEL_IMG_URL);
         initDate();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         listView.setLayoutManager(layoutManager);
         ChapterAdapter adapter = new ChapterAdapter(chapterList);
         listView.setAdapter(adapter);
-//        list = getData();
-//        ArrayAdapter<String> myArrayAdapter = new ArrayAdapter<String>
-//                (this,android.R.layout.simple_list_item_1,list);
-//        listView.setAdapter(myArrayAdapter);
         imageView = (ImageView)findViewById(R.id.img);
-        imageView.setImageResource(R.drawable.book);
+        nameView.setText(novelName);
+
+        //TODO 修改读取本地缓存实现
+        Glide.with(NovelChapterListActivity.this)
+                .load(novelImgUrl)
+                .fitCenter()
+                .placeholder(R.drawable.book)
+                .crossFade()
+                .into(imageView);
     }
 
     private Handler handler = new Handler() {

@@ -14,9 +14,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.winter.myapplication.entity.Chapter;
@@ -38,7 +41,7 @@ import okhttp3.Call;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ChapterActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChapterActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     private static final String TAG = "ChapterActivity";
     public static final String CHAPTER_NO = "CHAPTER_NO";
@@ -58,6 +61,8 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
     private String chapterTitle = "";
     private ChapterAdapter mContentAdapter;
     private int mCurrentPositioin;
+    private static int mFontSize = 10;
+    private static int mLightIntensity = 50;
 
     public static Intent newIntent(Context context, String novelNo, String chapterNO, String chapterTitle) {
         Log.e(TAG, novelNo + chapterNO + chapterTitle);
@@ -91,6 +96,13 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
 //        String no = getIntent().getStringExtra("no");
         getData();
         textView.setText(content);
+        textView.setTextSize(mFontSize);
+
+        Window window = ChapterActivity.this.getWindow();
+        WindowManager.LayoutParams lp = window.getAttributes();
+        lp.screenBrightness = (mLightIntensity <= 0 ? 1 : mLightIntensity) / 255f;
+        window.setAttributes(lp);
+
     }
 
     private Handler handler = new Handler() {
@@ -162,6 +174,13 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
         TextView tv1 = (TextView)contentView.findViewById(R.id.pop_forward_chapter);
         TextView tv2 = (TextView)contentView.findViewById(R.id.pop_content_btn);
         TextView tv3 = (TextView)contentView.findViewById(R.id.pop_last_chapter);
+        SeekBar fontSeekBar = (SeekBar) contentView.findViewById(R.id.font_size);
+        SeekBar lightSeekBar = (SeekBar) contentView.findViewById(R.id.light_intensity);
+
+        fontSeekBar.setProgress(mFontSize);
+        lightSeekBar.setProgress(mLightIntensity);
+        fontSeekBar.setOnSeekBarChangeListener(this);
+        lightSeekBar.setOnSeekBarChangeListener(this);
 
         tv1.setOnClickListener(this);
         tv2.setOnClickListener(this);
@@ -305,6 +324,40 @@ public class ChapterActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 getData();
                 break;
+            case R.id.font_size:
+
+                break;
         }
     }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        int id = seekBar.getId();
+        if (id == R.id.font_size) {
+            textView.setTextSize(progress+10);
+            mFontSize = progress;
+        }
+        if (id == R.id.light_intensity) {
+            Log.e(TAG, "light_intensity");
+            Window window = ChapterActivity.this.getWindow();
+            WindowManager.LayoutParams lp = window.getAttributes();
+            if (progress == -1) {
+                lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
+            } else {
+                lp.screenBrightness = (progress <= 0 ? 1 : progress) / 255f;
+            }
+            window.setAttributes(lp);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+//        updateUI();
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
 }
